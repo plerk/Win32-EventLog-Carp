@@ -1,6 +1,8 @@
-Carp.pm
+Build.PL
+lib/Win32/EventLog/Carp.pm
 Changes
 Makefile.PL
 MANIFEST
+META.yml
 README
-
+t/01-Win32-EventLog-Carp.t

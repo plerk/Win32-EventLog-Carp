@@ -1,4 +1,17 @@
-Revision history for Perl extension Win32::EventLog::Carp.
+Revision history for Perl extension Win32::EventLog::Carp.  (Note:
+Potential incompatabilities are marked with '*'.)
+
+1.30  Thu June  3 2004
+	- added tests
+	- fixed issue with uninitialized values (RT#5408).
+	- added Build.PL as alternative to Makefile.PL
+	- added META.yml to distribution
+	* source registration disabled by default; must be enabled in import
+	- renamed global variables with initial caps
+	- added note in POD about Windows 2003/IIS security policy
+	- added require for Carp::Heavy because of longmess_heavy and
+	  shortmess_heavy routines
+	- added note in POD about warnings from Win32::EventLog
 
 1.21  23 Jul 2001
 	- removed warning message when an attempt to register a custom event
@@ -29,7 +42,7 @@ Revision history for Perl extension Win32::EventLog::Carp.
 	  (which means warnings and errors from most other modules used by
 	  the calling program will be posted to the event log)
 	- @ISA Carp
-	- changed behavior of 'click' to use Carp::shortmess
+	* changed behavior of 'click' to use Carp::shortmess
 	- carriage-return/newline combinations handled better in event text
 	- blank lines in event text are ignored
 

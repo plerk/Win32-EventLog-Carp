@@ -5,20 +5,21 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
 require Exporter;
 
-@ISA       = qw( Exporter Carp );
+@ISA       = qw( Exporter );
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.21';
+$VERSION   = '1.30';
 
-use Carp;
+require Carp;
+require Carp::Heavy;
 
-use File::Basename qw( basename );
-use File::Spec qw( rel2abs );
+use File::Basename 'basename';
+use File::Spec 'rel2abs';
 
 use Win32::EventLog;
 
-my ($log, $source, $filename, $log_evals);
+my ($EventLogHandle, $Source, $SourceFileName, $LogEvals, $Register);
 
 # We want to provide options on the 'use Win32::EventLog::Carp' line
 
@@ -31,22 +32,22 @@ sub import
 
     foreach (@options)
       {
-	$source    = $_->{Source};   # Source name (defaults to script name)
-        $log_evals = $_->{LogEvals}; # Do we log evals when they fail?
+	$Source    = $_->{Source};   # Source name (defaults to script name)
+        $LogEvals  = $_->{LogEvals}; # Do we log evals when they fail?
+        $Register  = $_->{Register}; # Should we register the source?
       }
-
     @_ = ($package, @exports);
     goto &Exporter::import;
   }
 
 sub register_source
 
-# If the Win32::EventLog::Message module is available, register the source
-# with the Windows NT event log (this only works if the user has the proper
-# permissions). This removes the 'description not found' warning in when
-# looking at the event in the event log viewer.
+  # If the Win32::EventLog::Message module is available, register the source
+  # with the Windows NT event log (this only works if the user has the proper
+  # permissions). This removes the 'description not found' warning in when
+  # looking at the event in the event log viewer.
 
-# Needs to check if a log is created, and if so, close it and then reopen it.
+  # Needs to check if a log is created, and if so, close it and then reopen it.
 
   {
     my ($log_name, $source_name) = @_;
@@ -60,10 +61,9 @@ sub register_source
       Win32::EventLog::Message::RegisterSource( $log_name, $source_name );
     };
 
-#     if ($@)
-#       {
-# 	CORE::warn "Unable to register source \`$source_name\' in \`$log_name\' log";
-#       }
+    if ($@) {
+      CORE::warn "Unable to register source \`$source_name\' in \`$log_name\' log";
+    }
   }
 
 sub _report
@@ -71,22 +71,20 @@ sub _report
 # Reports an event in the Windows NT event log.
 
   {
-
-    unless ($log)
+    unless ($EventLogHandle)
       {
-	Win32::EventLog::Carp::register_source( "Application", $source );
-
 	# Create a handle to the Windows NT event log (we do this in the BEGIN
 	# block so that we can trap some compilation errors).
 
-	$log    = Win32::EventLog->new( $source )
+	$EventLogHandle = Win32::EventLog->new(
+            "Application", $ENV{COMPUTERNAME} )
 	  or CORE::die "Unable to initialize Windows NT event log";
 
       }
 
     # If for some reason the log isn't initialized...!
 
-    unless ($log)
+    unless (defined $EventLogHandle)
       {
 	CORE::die
 	  "Win32::EventLog not initialized in Win32::EventLog::Carp";
@@ -95,29 +93,36 @@ sub _report
 
     my ($event_type, $event_text) = @_;
 
+    unless ((defined $event_text) && (defined $event_type)) {
+      return; }
+
     # Change newlines to semicolons ('; ') since they do not show up well in
     # the event log viewer (does Windows 2000 handle newlines better?)
 
-    $event_text = join(": ", $filename, $event_text);
+    $event_text = join(": ", $SourceFileName, $event_text);
 
-    $event_text =~ s/\x0/; /g;                # only one string is used
+#     $event_text =~ s/\x0/; /g;                # only one string is used
     $event_text =~ s/(\r?\n){1,}(?!\z)/\; /g;
     $event_text =~ s/\r?\n\z//;
 
     my $event = {
+                 Computer  => $ENV{COMPUTERNAME},
+                 Source    => $Source,
 		 EventID   => 0,
+                 Category  => 0,
 		 EventType => $event_type,
-		 Strings   => $event_text
+		 Strings   => $event_text,
+                 Data      => "",
 		};
 
-    $log->Report( $event );
+    $EventLogHandle->Report( $event );
   }
 
 # Test to see if we're in an eval { }
 
 sub _ineval
   {
-    if ($log_evals) # If $log_evals is true, lie and say we're never in an eval
+    if ($LogEvals) # If $LogEvals is true, lie and say we're never in an eval
       {
 	return;
       }
@@ -152,9 +157,9 @@ BEGIN
   {
     # These are hooks for defining our own Source and Log
 
-    $filename = File::Spec->rel2abs( $0 );
+    $SourceFileName = File::Spec->rel2abs( $0 );
 
-    unless ($source)
+    unless ($Source)
       {
 
 	# We use the basename of the file because registry keys cannot have
@@ -163,8 +168,12 @@ BEGIN
 	# event text (after all, an error in 'index.pl' doesn't tell us which
 	# one).
 
-	$source =  File::Basename::basename( $filename );
+	$Source =  File::Basename::basename( $SourceFileName );
       }
+
+    if ($Register) {
+      register_source( "Application", $Source );
+    }
 
     # If there's already a handler, we just report the error to the log and
     # go to the existing handler (so we assume the other handler does what
@@ -205,10 +214,10 @@ BEGIN
 
 sub _closelog()
   {
-    if ($log)
+    if ($EventLogHandle)
       {
-	$log->Close();
-	$log = undef;
+ 	$EventLogHandle->Close();
+	$EventLogHandle = undef;
       }
   }
 
@@ -227,6 +236,7 @@ sub carp    { CORE::warn Carp::shortmess @_;    }
 sub croak   { CORE::die  Carp::shortmess @_;   }
 sub cluck   { CORE::warn Carp::longmess @_;   }
 sub confess { CORE::die  Carp::longmess @_; }
+
 
 # Since posting diagnostic (non-warning/error) messages into the event log
 # is useful, why not a function that simply reports to the log and STDERR
@@ -251,7 +261,7 @@ Win32::EventLog::Carp - for carping in the Windows NT Event Log
   Carp
   Win32::EventLog
 
-The module will use C<Win32::EventLog::Message> to register itself as a
+The module will use F<Win32::EventLog::Message> to register itself as a
 source, if that module is installed.
 
 =head1 SYNOPSIS
@@ -264,11 +274,11 @@ source, if that module is installed.
 
 =head1 DESCRIPTION
 
-C<Win32::EventLog::Carp> traps warnings and fatal errors in Perl and reports
+F<Win32::EventLog::Carp> traps warnings and fatal errors in Perl and reports
 these errors in the Windows NT Event Log. This is useful for scripts which
 run as services or through the scheduler, and for CGI/ISAPI scripts.
 
-The interface is similar to C<Carp>: the C<carp>, C<croak> and C<confess>
+The interface is similar to F<Carp>: the C<carp>, C<croak> and C<confess>
 functions are exported (with C<cluck> being optional).  You need only change
 references of "Carp" to "Win32::EventLog::Carp" to begin using this module.
 
@@ -279,7 +289,7 @@ One notable exception is the addition of the C<click> function:
 This outouts a message to STDERR with a short stack trace and allows scripts
 to post a simple "I have started" or "I am doing XYZ now" message to the log.
 To avoid the stack trace, end the message with a newline (which is what
-happens with the C<Carp> module).
+happens with the F<Carp> module).
 
 All messages are posted the the Application Log we well as to STDERR.
 
@@ -318,7 +328,7 @@ C<LogEvals> option:
 
 =head2 Event Source Registration
 
-If the C<Win32::EventLog::Message> module is installed on the system, I<and if
+If the F<Win32::EventLog::Message> module is installed on the system, I<and if
 the script is run with the appropriate (Administrator) permissions>, then
 Perl program will attempt register itself as an event source. Which means
 that
@@ -344,19 +354,20 @@ You can specify a different event source. The following
           Source => 'MyProject'
 	};
 
-will list the source as "MyProject" rather than the filename. Future
-versions of the module may allow you to post events in the System or
-Security logs.
+will list the source as "MyProject" rather than the filename.
+
+Future versions of the module may allow you to post events in the
+System or Security logs.
 
 This feature should be considered experimental.
 
-Caveat: the effect of multiple modules using C<Win32::EventLog::Carp>
+Caveat: the effect of multiple modules using F<Win32::EventLog::Carp>
 with sources set and which call each other may have funny interactions.
 This has not been thoroughly tested.
 
 =head2 Forcing a Stack Trace
 
-As with C<Carp>, you can force a stack trace by specifying the C<verbose>
+As with F<Carp>, you can force a stack trace by specifying the C<verbose>
 option:
 
   perl -MCarp=verbose script.pl
@@ -369,22 +380,45 @@ slashes in registered event log source names). The downside is that we have
 to view the event text to see which script it is (for common script names
 in a web site, for instance).
 
+Because of issues with F<Win32::EventLog>, running a script with the warning
+flag enabled (perl -w scriptname) will produce a lot of warnings about
+uninitialized values.
+
+In some server configurations using IIS (Windows Server 2003), you may
+need to set security policy to grant permissions to write to the event
+log(s).
+
 =head1 SEE ALSO
 
   Carp
-  CGI::Carp
   Win32::EventLog
   Win32::EventLog::Message
 
-C<Win32::EventLog::Message> can be found at http://www.roth.net/perl/packages/
+F<Win32::EventLog::Message> can be found at
+L<http://www.roth.net/perl/packages/>
+
+A PowerPoint presentation about this module can be found at
+L<http://stonybrook.pm.org/>
+
+=head2 Related Modules
+
+  CGI::Carp
+  Tk::Carp
+  Win32::GUI::Carp
+  Wx::Perl::Carp
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <rrwo at cpan.org>
+
+=head2 Suggestions and Bug Reporting
+
+Feedback is always welcome.  Please use the CPAN Request Tracker at
+L<http://rt.cpan.org> to submit bug reports.
 
 =head1 LICENSE
 
-Copyright (c) 2000-2001 Robert Rothenberg. All rights reserved.
+Copyright (c) 2000-2004, Robert Rothenberg. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

@@ -13,13 +13,6 @@ REQUIREMENTS
       make
       make install
 
-HISTORY
-    Changes since Win32::EventLog::Carp v1.20
-
-    1.21  23 Jul 2001
-	- removed warning message when an attempt to register a custom event
-	  source (using Win32::EventLog::Message) fails
-
 SYNOPSIS
       use Win32::EventLog::Carp;
       croak "We're outta here!";
@@ -41,11 +34,29 @@ DESCRIPTION
     A more detailed description can be found in the module's POD docu-
     mentation.
 
+REVISION HISTORY
+    Changes since Win32::EventLog::Carp v1.21.  (Note: potential
+    incompatabilities are marked with '*'.)
+
+    1.30  Thu June  3 2004
+	- added tests
+	- fixed issue with uninitialized values (RT#5408).
+	- added Build.PL as alternative to Makefile.PL
+	- added META.yml to distribution
+	* source registration disabled by default; must be enabled in import
+	- renamed global variables with initial caps
+	- added note in POD about Windows 2003/IIS security policy
+	- added require for Carp::Heavy because of longmess_heavy and
+	  shortmess_heavy routines
+	- added note in POD about warnings from Win32::EventLog
+
+    A detailed revision history is in the Changes file included with
+    this distribution.
+
 AUTHOR
-    Robert Rothenberg <rrwo@cpan.org>
+    Robert Rothenberg <rrwo at cpan.org>
 
 LICENSE
-    Copyright (c) 2000-2001 Robert Rothenberg. All rights reserved. This
+    Copyright (c) 2000-2004 Robert Rothenberg. All rights reserved. This
     program is free software; you can redistribute it and/or modify it under
     the same terms as Perl itself.
-
