@@ -45,18 +45,16 @@ DESCRIPTION
     mentation.
 
 REVISION HISTORY
-    Changes since Win32::EventLog::Carp v1.33.  (Note: potential
+    Changes since Win32::EventLog::Carp v1.35.  (Note: potential
     incompatabilities are marked with '*'.)
 
-    1.35  Mon Jul 26 2004
-	- rebuilt distribution with proper META.yml
-	- build requires Test::Exception
-	- minor changes to documentation
-
-    1.34  Wed Jun 30 2004
-	- added note about using Test::Exception
-	- fixed warning posted to log when unable to read event log
-	- moved Test::More to build_requires parameter
+    1.36  Tue Jul 27 2004
+ 	- removed 'use warnings' (min Perl 5.006, not Perl 5.005)
+	- removed Test::Exception from build_requires
+	- added tests for event source registration
+	- fixed event source registration
+	- corrected tests (in line with Log::Dispatch::Win32EventLog)
+	- event log is opened to $Source rather than "Application"
 
     A detailed revision history is in the Changes file included with
     this distribution.

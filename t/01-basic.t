@@ -1,21 +1,26 @@
 #-*- mode: perl;-*-
 
+use strict;
+# use warnings;
+
 # WARNING: This test will write 7*NUM_ROUNDS events to the Windows NT
 # event log.  (We test multiple rounds to verify that we are reading
 # the record for that specific round.)
 
 use constant NUM_ROUNDS => 2;
 
-use Test::More tests => 13+(39*NUM_ROUNDS);
+use constant SOURCE     => "Win32EventLogCarp Test";
 
-# TODO: fix issues with Test::Exception as source of errors, and make
-# use of it for more thorough tests.
+use Test::More tests => 12+(25*NUM_ROUNDS);
+
+use File::Spec;
+use Win32;
 
 my $hnd;
 my ($cnt1, $cnt2, $cnt3);
 
 sub open_log {
-  $hnd = new Win32::EventLog("Application", Win32::NodeName);
+  $hnd = new Win32::EventLog(SOURCE, Win32::NodeName);
 }
 
 sub close_log {
@@ -23,33 +28,50 @@ sub close_log {
   $hnd = undef;
 }
 
+sub get_number {
+  my $cnt = -1;
+  $hnd->GetNumber($cnt);
+  return $cnt;
+}
+
+
+sub get_last_event {
+  my $event = { };
+  if ($hnd->Read(
+    EVENTLOG_BACKWARDS_READ() | EVENTLOG_SEQUENTIAL_READ(), 0, $event)) {
+    return $event;
+  } else {
+    print "\x23 WARNING: Unable to read event log\n";
+    return;
+  }
+}
+
+
 BEGIN {
   ok( Win32::IsWinNT(), "Win32::IsWinNT?" );
   use_ok('Win32::EventLog');
 
   ok($Win32::EventLog::GetMessageText = 1,
-     "Set Win32::EventLog::GetMessageTest");
+     "Set Win32::EventLog::GetMessageText");
 
   open_log();
-  ok(defined $ENV{COMPUTERNAME}, "COMPUTERNAME defined");
 
-  $hnd = new Win32::EventLog("Application", $ENV{COMPUTERNAME});
   ok(defined $hnd, "EventLog Handle defined");
 
   # We need to verify that the just loading Win32::EventLog::Carp does
   # not cause errors or warnings that add tothe event log!
 
-  $hnd->GetNumber($cnt1);
+  $cnt1 = get_number();
   ok(defined $cnt1, "Get size of event log");
 
-  use_ok('Win32::EventLog::Carp');
+  use_ok('Win32::EventLog::Carp', { Source => SOURCE } );
 
   ok(!$Win32::EventLog::Carp::LogEvals, "Check LogEvals");
   $Win32::EventLog::Carp::LogEvals = 1;
   ok($Win32::EventLog::Carp::LogEvals,  "Set LogEvals");
 
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
 
   ok($cnt2 == $cnt1, "Check against rt.cpan.org issue \x235408");
@@ -58,51 +80,53 @@ BEGIN {
 
 my %Events = ( );
 
+my $time = time();
+
 for my $tag (1..NUM_ROUNDS) {
   $cnt1 = $cnt2;
 
-  Win32::EventLog::Carp::click "test,click,$tag";
+  Win32::EventLog::Carp::click "test,click,$tag,$time";
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from click");
-  $Events{"click,$tag"} = EVENTLOG_INFORMATION_TYPE;
+  $Events{"click,$tag,$time"} = EVENTLOG_INFORMATION_TYPE;
 
   $cnt1 = $cnt2;
 
-  warn "test,warn,$tag";
+  warn "test,warn,$tag,$time";
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from warn");
-  $Events{"warn,$tag"} = EVENTLOG_WARNING_TYPE;
+  $Events{"warn,$tag,$time"} = EVENTLOG_WARNING_TYPE;
 
   $cnt1 = $cnt2;
 
-  carp "test,carp,$tag";
+  carp "test,carp,$tag,$time";
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from carp");
-  $Events{"carp,$tag"} = EVENTLOG_WARNING_TYPE;
+  $Events{"carp,$tag,$time"} = EVENTLOG_WARNING_TYPE;
 
   $cnt1 = $cnt2;
 
-  Win32::EventLog::Carp::cluck "test,cluck,$tag";
+  Win32::EventLog::Carp::cluck "test,cluck,$tag,$time";
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from cluck");
-  $Events{"cluck,$tag"} = EVENTLOG_WARNING_TYPE;
+  $Events{"cluck,$tag,$time"} = EVENTLOG_WARNING_TYPE;
 
   $cnt1 = $cnt2;
   $Win32::EventLog::Carp::LogEvals = 0;
   ok(!$Win32::EventLog::Carp::LogEvals, "Unset LogEval");
   eval {
-    die "test,evaldie,$tag";
+    die "test,evaldie,$tag,$time";
   };
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 == $cnt1, "Event log did not grow from eval die");
 
@@ -110,33 +134,33 @@ for my $tag (1..NUM_ROUNDS) {
   $Win32::EventLog::Carp::LogEvals = 1;
   ok($Win32::EventLog::Carp::LogEvals, "Set LogEval");
   eval {
-    die "test,die,$tag";
+    die "test,die,$tag,$time";
   };
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from die");
-  $Events{"die,$tag"} = EVENTLOG_ERROR_TYPE;
+  $Events{"die,$tag,$time"} = EVENTLOG_ERROR_TYPE;
 
   $cnt1 = $cnt2;
   eval {
-    croak "test,croak,$tag";
+    croak "test,croak,$tag,$time";
   };
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from croak");
-  $Events{"croak,$tag"} = EVENTLOG_ERROR_TYPE;
+  $Events{"croak,$tag,$time"} = EVENTLOG_ERROR_TYPE;
 
   $cnt1 = $cnt2;
   eval {
-    confess "test,confess,$tag";
+    confess "test,confess,$tag,$time";
   };
 
-  $hnd->GetNumber($cnt2);
+  $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
   ok($cnt2 > $cnt1, "Event log grown from confess");
-  $Events{"confess,$tag"} = EVENTLOG_ERROR_TYPE;
+  $Events{"confess,$tag,$time"} = EVENTLOG_ERROR_TYPE;
 }
 
 # In order to verify all of the events, we read through the event log
@@ -144,37 +168,39 @@ for my $tag (1..NUM_ROUNDS) {
 # do this because another application might have written to the event
 # log while the tests were running.
 
-sub _get_last_event {
-  my $event = { };
-  if ($hnd->Read(
-    EVENTLOG_BACKWARDS_READ | EVENTLOG_SEQUENTIAL_READ, 0, $event)) {
-    return $event;
-  } else {
-    print "\x23 WARNING: Unable to read event log";
-    return;
-  }
-}
-
 # use YAML 'Dump';
 
+open_log();
+
 {
+
   ok((keys %Events) == (7*NUM_ROUNDS), "Events stacked to verify");
 
+  my $pathname = File::Spec->rel2abs($0);
   my $filename = $0;
   $filename =~ s/\\/\\\\/g; # escape backslashes
 
-  while ((keys %Events) && (my $event = _get_last_event())) {
-#    print STDERR Dump($event);
-    if ($filename =~ /$event->{Source}$/) {
+
+    while ((keys %Events) && (my $event = get_last_event())) {
+
+#    print STDERR YAML->Dump($event);
+
       my $string = $event->{Strings};
-      ok( $string =~ /test\,(\w+)\,(\d+) at $filename/,
-        "Found test event from $filename" );
-      my $key = "$1,$2";
-      my $val = delete $Events{$key};
-      ok(defined $val, "Found log entry for $key");
-      ok($val == $event->{EventType}, "Verify log entry type for $key");
-    }
+
+      if ( ($string =~ /$filename\: test\,(\w+)\,(\d+),(\d+) at $filename/) &&
+	   ($event->{Source} eq SOURCE) ) {
+	if( $3 == $time) {
+	  my $key = "$1,$2,$3";
+	  ok((delete $Events{$key}) == $event->{EventType},
+	     "verified event $key");
+	}
+      }
+      else {
+	print STDERR "\x23 Ignoring event: $string\n";
+      }
+      
   }
+
   ok((keys %Events)==0, "All events verified");
 }
 
@@ -184,4 +210,4 @@ END {
   close_log();
 }
 
-
+__END__

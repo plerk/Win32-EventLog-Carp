@@ -1,7 +1,7 @@
 package Win32::EventLog::Carp;
 
 use strict;
-use warnings;
+# use warnings;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $LogEvals);
 
 require Exporter;
@@ -10,16 +10,17 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.35';
+$VERSION   = '1.36';
 
 require Carp;
 require Carp::Heavy;
 
-use File::Basename 'basename';
-use File::Spec 'rel2abs';
+use File::Basename;
+use File::Spec;
 
 use Win32::EventLog qw(
   EVENTLOG_INFORMATION_TYPE EVENTLOG_WARNING_TYPE EVENTLOG_ERROR_TYPE
+  EVENTLOG_AUDIT_SUCCESS EVENTLOG_AUDIT_FAILURE
 );
 
 my ($EventLogHandle, $Source, $SourceFileName, $Register);
@@ -39,6 +40,11 @@ sub import
         $LogEvals  = $_->{LogEvals}; # Do we log evals when they fail?
         $Register  = $_->{Register}; # Should we register the source?
       }
+
+    if ($Register) {
+      register_source( $Register, $Source );
+    }
+
     @_ = ($package, @exports);
     goto &Exporter::import;
   }
@@ -58,13 +64,13 @@ sub register_source
     # Really what we need to do is to check if the source is registered
     # first...
 
-#     my $aux = $LogEval; $LogEval = 0;   # save LogEval
+    my $aux = $LogEvals; $LogEvals = 0;  # save LogEvals
     eval {
       require Win32::EventLog::Message;
       import Win32::EventLog::Message;
       Win32::EventLog::Message::RegisterSource( $log_name, $source_name );
     };
-#     $LogEval = $aux;                    # restore LogEval
+    $LogEvals = $aux;                   # restore LogEvals
 
     if ($@) {
       CORE::warn "Unable to register source \`$source_name\' in \`$log_name\' log";
@@ -82,7 +88,7 @@ sub _report
 	# block so that we can trap some compilation errors).
 
 	$EventLogHandle = Win32::EventLog->new(
-            "Application", Win32::NodeName )
+            $Source, Win32::NodeName )
 	  or CORE::die "Unable to initialize Windows NT event log";
 
       }
@@ -100,6 +106,19 @@ sub _report
 
     unless ((defined $event_text) && (defined $event_type)) {
       return; }
+
+    # If we're posting to the security log, convert the event types to
+    # ones associated with the security log. (In reality, Windows
+    # doesn't seem to care, but we want to play nice...)
+
+    if (($Register||"") eq "Security") {
+      if ($event_type == EVENTLOG_INFORMATION_TYPE) {
+	$event_type = EVENTLOG_AUDIT_SUCCESS;
+      }
+      else {
+	$event_type = EVENTLOG_AUDIT_FAILURE;
+      }
+    }
 
     # Change newlines to semicolons ('; ') since they do not show up well in
     # the event log viewer (does Windows 2000 handle newlines better?)
@@ -176,10 +195,6 @@ BEGIN
 	$Source =  File::Basename::basename( $SourceFileName );
       }
 
-    if ($Register) {
-      register_source( "Application", $Source );
-    }
-
     # If there's already a handler, we just report the error to the log and
     # go to the existing handler (so we assume the other handler does what
     # it should); otherwise we use our own.
@@ -243,7 +258,6 @@ sub carp    { CORE::warn Carp::shortmess @_;    }
 sub croak   { CORE::die  Carp::shortmess @_;   }
 sub cluck   { CORE::warn Carp::longmess @_;   }
 sub confess { CORE::die  Carp::longmess @_; }
-
 
 # Since posting diagnostic (non-warning/error) messages into the event log
 # is useful, why not a function that simply reports to the log and STDERR
@@ -368,14 +382,24 @@ You can specify a different event source. The following
 
 will list the source as "MyProject" rather than the filename.
 
-Future versions of the module may allow you to post events in the
-System or Security logs.
+=head2 Logging to Security or System Logs
 
-This feature should be considered experimental.
+You can specify a log other than the Application Log to report events
+to:
 
-Caveat: the effect of multiple modules using C<Win32::EventLog::Carp>
-with sources set and which call each other may have funny interactions.
-This has not been thoroughly tested.
+  use Win32::EventLog::Carp 1.36
+        {
+          Register => 'System'
+	};
+
+Events can only be posted to one log.  (For example, you cannot have
+some events go to the Application Log while others go to the Security
+Log.)
+
+Once you have registered a source to an event log, it may not be
+possible to register it to a different log.
+
+This feature should still be considered experimental.
 
 =head2 Forcing a Stack Trace
 
@@ -408,22 +432,33 @@ Windows 95/98/ME scripts.
 
 =head1 KNOWN ISSUES
 
+See L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-EventLog-Carp>
+for an up-to-date list of known issues and bugs.
+
+=head2 Basename of Event Source
+
 We use the basename of the script as the event source, rather than the full
 pathname. This allows us to register the source name (since we cannot have
-slashes in registered event log source names). The downside is that we have
-to view the event text to see which script it is (for common script names
-in a web site, for instance).
+slashes in registered event log source names).
+
+The downside is that we have to view the event text to see which
+script it is (for common script names in a web site, for instance).
+In such cases, define a custom source name related to the application.
+
+=head2 IIS and Windows Server 2003
 
 In some server configurations using IIS (Windows Server 2003), you may
 need to set security policy to grant permissions to write to the event
 log(s).
 
-When using C<Test::Exception> functions such as C<dies_ok>, the source
-will be listed as the C<Test::Exception> module rather than the script
+=head2 Test::Exception and Test::Warn
+
+When using L<Test::Exception> functions such as C<dies_ok>, the source
+will be listed as the "Test::Exception" module rather than the script
 that is running the tests.
 
-See L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-EventLog-Carp>
-for an up-to-date list of known issues and bugs.
+L<Test::Warn> functions will block warnings from being posted to the
+event log altogether.
 
 =head1 SEE ALSO
 

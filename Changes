@@ -1,6 +1,14 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.36  Tue Jul 27 2004
+ 	- removed 'use warnings' (min Perl 5.006, not Perl 5.005)
+	- removed Test::Exception from build_requires
+	- added tests for event source registration
+	- fixed event source registration
+	- corrected tests (in line with Log::Dispatch::Win32EventLog)
+	- event log is opened to $Source rather than "Application"
+
 1.35  Mon Jul 26 2004
 	- rebuilt distribution with proper META.yml
 	- build requires Test::Exception
