@@ -1,9 +1,18 @@
 Revision history for Perl extension Win32::EventLog::Carp.
 
-0.02  Mon Mar  6 00:47:20 2000
-	- original version
+1.00  10 Jan 2001
+        - This version is a serious re-write!
+	- Win32 events are posted by trapping __WARN__ and __DIE__ signals
+	  (which means warnings and errors from most other modules used by
+	  the calling program will be posted to the event log)
+	- @ISA Carp
+	- changed behavior of 'click' to use Carp::shortmess
+	- carriage-return/newline combinations handled better in event text
+	- blank lines in event text are ignored
 
-0.04
+0.04  7 Mar 2000
 	- added a 'click' function for information messages
 	- newlines in event strings converted to spaces
 
+0.02  6 Mar 2000
+	- original version

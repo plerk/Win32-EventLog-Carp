@@ -1,48 +1,59 @@
 NAME
     Win32::EventLog::Carp - for carping in the Windows NT Event Log
 
-SYNOPSIS
-      use Win32::EventLog::Carp;
-
-      my $code = &something() or croak "Unable to do something";
-
-      unless ($code)
-      {
-          carp "Nothing from something";
-      }
-
-DESCRIPTION
-    Win32::EventLog::Carp is a wrapper for the Carp module so that
-    messages are added to the Windows NT Event Log. This is useful
-    for Perl scripts which run as services or through the scheduler.
-
-    The interface is basically the same as Carp and it should
-    function in the same way (though it has not been tested as
-    thoroughly). You need only change references of "Carp" to
-    "Win32::EventLog::Carp" to begin using this module.
-
-    One notable exception is the addition of the *click* function:
-
-      Win32::EventLog::Carp::click "Make a jazz noise here.";
-
-    This outputs the message to STDERR without a stack trace, and
-    allows scripts\ to post a simple "I have started" or "I am doing
-    XYZ now" message to the log.
-
-    All messages are posted the the Application Log we well as to
-    STDERR.
-
 REQUIREMENTS
       Carp
       Win32::EventLog
 
-BUGS
-    Any bugs in Win32::EventLog and Carp will lead to bugs with this
-    module.
+  Installation
+
+    Installation is pretty standard:
+
+      perl Makefile.PL
+      make
+      make install
+
+HISTORY
+    Changes since Win32::EventLog::Carp v0.04
+
+    1.00  10 Jan 2001
+        - This version is a serious re-write!
+	- Win32 events are posted by trapping __WARN__ and __DIE__ signals
+	  (which means warnings and errors from most other modules used by
+	  the calling program will be posted to the event log)
+	- @ISA Carp
+	- changed behavior of 'click' to use Carp::shortmess
+	- carriage-return/newline combinations handled better in event text
+	- blank lines in event text are ignored
+
+    There should be no incompatabilities with past versions.
+
+SYNOPSIS
+      use Win32::EventLog::Carp;
+      croak "We're outta here!";
+
+      use Win32::EventLog::Carp qw(cluck);
+      cluck "This is how we got here!";
+
+DESCRIPTION
+    `Win32::EventLog::Carp' traps warnings and fatal errors in Perl and
+    reports these errors in the Windows NT Event Log. This is useful for
+    scripts which run as services or through the scheduler, and for
+    CGI/ISAPI scripts.
+
+    The interface is similar to `Carp': the `carp', `croak' and `confess'
+    functions are exported (with `cluck' being optional). You need only
+    change references of "Carp" to "Win32::EventLog::Carp" to begin using
+    this module.
+
+    A more detailed description can be found in the module's POD docu-
+    mentation.
 
 AUTHOR
     Robert Rothenberg <rrwo@cpan.org>
 
-SEE ALSO
-    Win32::EventLog, Carp
+LICENSE
+    Copyright (c) 2000-2001 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
 

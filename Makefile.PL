@@ -1,7 +1,14 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
 WriteMakefile(
-    'NAME'	=> 'Win32::EventLog::Carp',
-    'VERSION_FROM' => 'Carp.pm', # finds $VERSION
+    'NAME'	   => 'Win32::EventLog::Carp',
+    'VERSION_FROM' => 'Carp.pm',
+    'PREREQ_PM'	   => {
+        'Carp'            => 0,
+        'Win32::EventLog' => 0,
+      },
+    'NORECURS'     => 1,
+  ($] ge '5.005') ? (
+    'AUTHOR'       => 'Robert Rothenberg (rrwo@cpan.org)',
+    'ABSTRACT'     => 'For carping into the Windows NT Event Log',
+  ) : (),
 );
