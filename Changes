@@ -1,6 +1,11 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.37  Fri Aug  6 2004
+	- corrected how unregistered logs are opened
+	- corrected opening new error log in 01-basic.t test
+	- updated KNOWN ISSUES section of POD
+
 1.36  Tue Jul 27 2004
  	- removed 'use warnings' (min Perl 5.006, not Perl 5.005)
 	- removed Test::Exception from build_requires

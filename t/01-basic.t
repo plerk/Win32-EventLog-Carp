@@ -9,7 +9,7 @@ use strict;
 
 use constant NUM_ROUNDS => 2;
 
-use constant SOURCE     => "Win32EventLogCarp Test";
+use constant SOURCE     => "Application"; # "Win32EventLogCarp Test";
 
 use Test::More tests => 12+(25*NUM_ROUNDS);
 

@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.36';
+$VERSION   = '1.37';
 
 require Carp;
 require Carp::Heavy;
@@ -87,8 +87,9 @@ sub _report
 	# Create a handle to the Windows NT event log (we do this in the BEGIN
 	# block so that we can trap some compilation errors).
 
-	$EventLogHandle = Win32::EventLog->new(
-            $Source, Win32::NodeName )
+	my $log = ($Register) ? $Source : "Application";
+
+	$EventLogHandle = Win32::EventLog->new( $log, Win32::NodeName )
 	  or CORE::die "Unable to initialize Windows NT event log";
 
       }
@@ -450,6 +451,9 @@ In such cases, define a custom source name related to the application.
 In some server configurations using IIS (Windows Server 2003), you may
 need to set security policy to grant permissions to write to the event
 log(s).
+
+See Microsoft KnowledgeBase Article 323076 at
+L<http://support.microsoft.com/default.aspx?scid=kb;en-us;323076>.
 
 =head2 Test::Exception and Test::Warn
 
