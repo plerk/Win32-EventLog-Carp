@@ -1,5 +1,9 @@
 Revision history for Perl extension Win32::EventLog::Carp.
 
+1.21  23 Jul 2001
+	- removed warning message when an attempt to register a custom event
+	  source (using Win32::EventLog::Message) fails
+
 1.20  12 Jul 2001
 	- added test for die within an eval; death in an eval is no longer
 	  reported in the event log by default
