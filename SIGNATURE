@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 54c8a017c47b189b46c3df8013d48c2350139a80 Build.PL
+SHA1 5f89ba94d26f2437d53cec4c43cd030d8efe5397 Changes
+SHA1 535a4d328bc35129a953f80b30e82954b3c3a4e7 MANIFEST
+SHA1 0f736bc7ea6385269aba3fd28706ff9beda3d882 META.yml
+SHA1 61557c757f9ba806a4db1d2f8594a28ef9f58936 Makefile.PL
+SHA1 5ab9d515b07ef116a0124cb8a537825cac1574dd README
+SHA1 9f16942ec9cc57e1892996e68d1a0d1e21b59bf7 lib/Win32/EventLog/Carp.pm
+SHA1 2cfe3431304cc106b477ef37d72b32ef8bb9bcbf t/01-basic.t
+SHA1 93f4c90478a692be010ecb3bf84beb0ef7e5c495 t/02-optional.t
+SHA1 11b341d979ae63977f4bac3b25789c9b76e66c55 t/03-register.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (MingW32)
+
+iD8DBQFBxoonV485gMKcmRARAil8AKCTn27Vxy7khHuxWFCDa9jOYfnwGwCfaFNz
+RUnY3GoFSL6gI9HGEQ89CFA=
+=P+pd
+-----END PGP SIGNATURE-----

@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.38';
+$VERSION   = '1.39';
 
 require Carp;
 require Carp::Heavy;

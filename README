@@ -68,6 +68,9 @@ REVISION HISTORY
     Changes since Win32::EventLog::Carp v1.37.  (Note: potential
     incompatabilities are marked with '*'.)
 
+    1.39  Mon Dec 20 2004
+	- corrected SIGNATURE issue
+
     1.38  Fri Dec 17 2004
 	- removed extraneous "ignoring event" message in tests
 	- fixed issue with tests failing on machines w/full logs
