@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.11';
+$VERSION   = '1.20';
 
 use Carp;
 
@@ -18,7 +18,9 @@ use File::Spec qw( rel2abs );
 
 use Win32::EventLog;
 
-my ($log, $source, $filename);
+my ($log, $source, $filename, $log_evals);
+
+# We want to provide options on the 'use Win32::EventLog::Carp' line
 
 sub import
   {
@@ -29,7 +31,8 @@ sub import
 
     foreach (@options)
       {
-	$source = $_->{Source};
+	$source    = $_->{Source};   # Source name (defaults to script name)
+        $log_evals = $_->{LogEvals}; # Do we log evals when they fail?
       }
 
     @_ = ($package, @exports);
@@ -48,11 +51,14 @@ sub register_source
   {
     my ($log_name, $source_name) = @_;
 
+    # Really what we need to do is to check if the source is registered
+    # first...
+
     eval {
       require Win32::EventLog::Message;
       import Win32::EventLog::Message;
       Win32::EventLog::Message::RegisterSource( $log_name, $source_name );
-    };    
+    };
 
     if ($@)
       {
@@ -107,22 +113,44 @@ sub _report
     $log->Report( $event );
   }
 
+# Test to see if we're in an eval { }
+
+sub _ineval
+  {
+    if ($log_evals) # If $log_evals is true, lie and say we're never in an eval
+      {
+	return;
+      }
+    else            # Otherwise actually do a test
+      {
+	# This test is based on the one used in CGI::Carp v1.20
+	return (Carp::longmess(@_) =~ /eval [\{\']/m)
+      }
+  }
+
+# Our own verson of "warn"
+
 sub _warn
   {
     _report( EVENTLOG_WARNING_TYPE, @_ );
     CORE::warn @_;
   }
 
+# Our own version of "die"
+
 sub _die
   {
-    _report( EVENTLOG_ERROR_TYPE, @_ );
+    unless (_ineval @_) # don't log it if we're in an eval
+      {
+	_report( EVENTLOG_ERROR_TYPE, @_ );
+      }
     CORE::die @_; 
   }
 
 
 BEGIN
   {
-    # There are hooks for defining our own Source and Log
+    # These are hooks for defining our own Source and Log
 
     $filename = File::Spec->rel2abs( $0 );
 
@@ -155,6 +183,9 @@ BEGIN
 	$SIG{__WARN__} = \&Win32::EventLog::Carp::_warn;
       }
 
+    # Likewise for "die", we put ourselves between an existing signal handler
+    # rather than take it over.
+
     if ($SIG{__DIE__})
       {
 	my $previous = $SIG{__DIE__};
@@ -170,6 +201,8 @@ BEGIN
 
   }
 
+# Close the event log.
+
 sub _closelog()
   {
     if ($log)
@@ -181,15 +214,23 @@ sub _closelog()
 
 END
   {
-
     # Make sure we clean up after ourselves!
     _closelog();
   }
+
+# Our own versions of Carp's functions ... we piggyback on Carp's special
+# "longmess" and shortmess" functions. (According to some discussion on
+# the Perl 5 Porters list in July 2001 these may be renamed to "yodel" and
+# "yelp", but with aliases for the old names. Don't panic.)
 
 sub carp    { CORE::warn Carp::shortmess @_;    }
 sub croak   { CORE::die  Carp::shortmess @_;   }
 sub cluck   { CORE::warn Carp::longmess @_;   }
 sub confess { CORE::die  Carp::longmess @_; }
+
+# Since posting diagnostic (non-warning/error) messages into the event log
+# is useful, why not a function that simply reports to the log and STDERR
+# without being considered an error? Hence, "click".
 
 sub click
   {
@@ -264,10 +305,16 @@ It is assumed that the previous handler will properly C<warn> or C<die> as
 appropriate. This module will instead report these events to the NT event
 log.
 
-=head2 eval and die
+=head2 Logging failed evals
 
-This module I<will> log errors in the event log when something dies in an
-eval.  This is a feature, not a bug.
+By default, this module will no longer log errors in the event log when
+something dies in an eval. If you would like to enable this, specify the
+C<LogEvals> option:
+
+  use Win32::EventLog::Carp
+        {
+	  LogEvals => 1
+	};
 
 =head2 Event Source Registration
 
@@ -294,7 +341,7 @@ You can specify a different event source. The following
 
   use Win32::EventLog::Carp qw(cluck carp croak click confess),
         {
-          Source => 'MyProject',
+          Source => 'MyProject'
 	};
 
 will list the source as "MyProject" rather than the filename. Future
@@ -306,6 +353,13 @@ This feature should be considered experimental.
 Caveat: the effect of multiple modules using C<Win32::EventLog::Carp>
 with sources set and which call each other may have funny interactions.
 This has not been thoroughly tested.
+
+=head2 Forcing a Stack Trace
+
+As with C<Carp>, you can force a stack trace by specifying the C<verbose>
+option:
+
+  perl -MCarp=verbose script.pl
 
 =head1 KNOWN ISSUES
 

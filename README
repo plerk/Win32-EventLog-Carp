@@ -14,22 +14,13 @@ REQUIREMENTS
       make install
 
 HISTORY
-    Changes since Win32::EventLog::Carp v1.00
+    Changes since Win32::EventLog::Carp v1.11
 
-    1.11  20 Jun 2001
-	- tested with Carp::Assert
-	- added register_source() function
-
-    1.10   7 Feb 2001
-	- uses Win32::EventLog::Message to register the source,
-	  if the module is installed on the system
-	- the registration and initialization of the event log handle
-	  will be done in the _report() function
-	- the event text now begins with the script's absolute path
-	- the 'Source' in the event log is now the script's basename
-	- NUL characters in event text are treated like newlines
-
-    There should be no incompatabilities with past versions.
+    1.20  12 Jul 2001
+	- added test for die within an eval; death in an eval is no longer
+	  reported in the event log by default
+	- added LogEvals option to report failed evals in the event log
+	- added note about forcing a stack trace in POD
 
 SYNOPSIS
       use Win32::EventLog::Carp;

@@ -1,5 +1,11 @@
 Revision history for Perl extension Win32::EventLog::Carp.
 
+1.20  12 Jul 2001
+	- added test for die within an eval; death in an eval is no longer
+	  reported in the event log by default
+	- added LogEvals option to report failed evals in the event log
+	- added note about forcing a stack trace in POD
+
 1.11  20 Jun 2001
 	- tested with Carp::Assert
 	- added register_source() function
