@@ -1,6 +1,13 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.32  Sat Jun  5 2004 
+	- documented how to use with Windows 95/98/ME
+	- use Win32::NodeName instead of $ENV{COMPUTERNAME}
+	- minor changes to how modules are imported
+	- corrected Build.PL to require Test::More and Win32
+	- Build.PL will die on non-NT machines
+
 1.31  Fri Jun  4 2004
 	- LogEvals can now be set outside of the module
 	- fixed bug with LogEvals being ignored if another function is

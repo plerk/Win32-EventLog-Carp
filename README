@@ -21,6 +21,8 @@ REQUIREMENTS
       perl Build test
       perl Build install
 
+    Note that the tests for this module will post to the event log!
+
 SYNOPSIS
       use Win32::EventLog::Carp;
       croak "We're outta here!";
@@ -43,27 +45,15 @@ DESCRIPTION
     mentation.
 
 REVISION HISTORY
-    Changes since Win32::EventLog::Carp v1.21.  (Note: potential
+    Changes since Win32::EventLog::Carp v1.31.  (Note: potential
     incompatabilities are marked with '*'.)
 
-    1.31  Fri Jun  4 2004
-	- LogEvals can now be set outside of the module
-	- fixed bug with LogEvals being ignored if another function is
-          hooked onto __DIE__ signal (RT#6508)
-	- rewrote tests to test writing every function, and to read 
-	  the events back
-
-    1.30  Thu June  3 2004
-	- added tests
-	- fixed issue with uninitialized values (RT#5408).
-	- added Build.PL as alternative to Makefile.PL
-	- added META.yml to distribution
-	* source registration disabled by default; must be enabled in import
-	- renamed global variables with initial caps
-	- added note in POD about Windows 2003/IIS security policy
-	- added require for Carp::Heavy because of longmess_heavy and
-	  shortmess_heavy routines
-	- added note in POD about warnings from Win32::EventLog
+    1.32  Sat Jun  5 2004 
+	- documented how to use with Windows 95/98/ME
+	- use Win32::NodeName instead of $ENV{COMPUTERNAME}
+	- minor changes to how modules are imported
+	- corrected Build.PL to require Test::More and Win32
+	- Build.PL will die on non-NT machines
 
     A detailed revision history is in the Changes file included with
     this distribution.

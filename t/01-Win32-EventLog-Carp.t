@@ -12,7 +12,7 @@ my $hnd;
 my ($cnt1, $cnt2, $cnt3);
 
 sub open_log {
-  $hnd = new Win32::EventLog("Application", $ENV{COMPUTERNAME});
+  $hnd = new Win32::EventLog("Application", Win32::NodeName);
 }
 
 sub close_log {
