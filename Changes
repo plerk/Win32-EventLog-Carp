@@ -1,6 +1,11 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.35  Mon Jul 26 2004
+	- rebuilt distribution with proper META.yml
+	- build requires Test::Exception
+	- minor changes to documentation
+
 1.34  Wed Jun 30 2004
 	- added note about using Test::Exception
 	- fixed warning posted to log when unable to read event log

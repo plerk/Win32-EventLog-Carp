@@ -9,6 +9,7 @@ WriteMakefile
                            'Carp::Heavy' => '0',
                            'File::Basename' => '0',
                            'File::Spec' => '0',
+                           'Test::Exception' => '0',
                            'Test::More' => '0',
                            'Win32' => '0',
                            'Win32::EventLog' => '0'

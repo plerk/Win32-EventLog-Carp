@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.34';
+$VERSION   = '1.35';
 
 require Carp;
 require Carp::Heavy;
@@ -440,6 +440,7 @@ L<http://stonybrook.pm.org/>
 =head2 Related Modules
 
   CGI::Carp
+  Log::Dispatch::Win32EventLog
   Tk::Carp
   Win32::GUI::Carp
   Wx::Perl::Carp

@@ -1,7 +1,8 @@
 --- #YAML:1.0
 name: Win32-EventLog-Carp
-version: 1.34
-author: Robert Rothenberg <rrwo at cpan.org>
+version: 1.35
+author:
+  - Robert Rothenberg <rrwo at cpan.org>
 abstract: for carping in the Windows NT Event Log
 license: perl
 requires:
@@ -15,6 +16,10 @@ requires:
 recommends:
   Win32::EventLog::Message: 0
 build_requires:
+  Test::Exception: 0
   Test::More: 0
-provides: {}
-generated_by: Module::Build version 0.25
+provides:
+  Win32::EventLog::Carp:
+    file: lib/Win32/EventLog/Carp.pm
+    version: 1.35
+generated_by: Module::Build version 0.25_02

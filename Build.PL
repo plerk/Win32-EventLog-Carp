@@ -26,6 +26,7 @@ my $build = Module::Build->new
        'Win32::EventLog::Message' => 0, # from www.roth.net
      },
      build_requires => {
+       'Test::Exception'          => 0,
        'Test::More'               => 0,
      },
      create_makefile_pl => 'traditional',
