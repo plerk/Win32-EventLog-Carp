@@ -16,12 +16,29 @@ DESCRIPTION
     messages are added to the Windows NT Event Log. This is useful
     for Perl scripts which run as services or through the scheduler.
 
-    The interface is the same as Carp and it should function in the
-    same way (though it hasn't been tested as thoroughly).
+    The interface is basically the same as Carp and it should
+    function in the same way (though it has not been tested as
+    thoroughly). You need only change references of "Carp" to
+    "Win32::EventLog::Carp" to begin using this module.
+
+    One notable exception is the addition of the *click* function:
+
+      Win32::EventLog::Carp::click "Make a jazz noise here.";
+
+    This outputs the message to STDERR without a stack trace, and
+    allows scripts\ to post a simple "I have started" or "I am doing
+    XYZ now" message to the log.
+
+    All messages are posted the the Application Log we well as to
+    STDERR.
 
 REQUIREMENTS
       Carp
       Win32::EventLog
+
+BUGS
+    Any bugs in Win32::EventLog and Carp will lead to bugs with this
+    module.
 
 AUTHOR
     Robert Rothenberg <rrwo@cpan.org>

@@ -3,3 +3,7 @@ Revision history for Perl extension Win32::EventLog::Carp.
 0.02  Mon Mar  6 00:47:20 2000
 	- original version
 
+0.04
+	- added a 'click' function for information messages
+	- newlines in event strings converted to spaces
+
