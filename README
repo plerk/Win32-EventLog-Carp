@@ -5,6 +5,8 @@ REQUIREMENTS
       Carp
       Win32::EventLog
 
+    These should be standard modules on Win32 systems.
+
   Installation
 
     Installation is pretty standard:
@@ -22,6 +24,24 @@ REQUIREMENTS
       perl Build install
 
     Note that the tests for this module will post to the event log!
+
+  Known Issues with Installation
+
+    * WinZip is unable to use POSIX-style long pathnames in tar files,
+      so it may ignore the directory structure of this package's 
+      distribution.  Alternate gzip and tar utilities can be found at
+      http://gnuwin32.sourceforge.net or http://unxutils.sourceforge.net
+
+    * The tests may fail on some systems.  If it fails, check your event
+      logs to verify that your Application log contains events with
+      messages of the form:
+
+        test,cluck,2,1103305379 at t\01-basic.t line 124
+
+      if so, it works and can be installed.
+
+      In certain other cases, tests will fail the first time they are
+      run on a system, but will succeed the second time they are run.
 
 SYNOPSIS
       use Win32::EventLog::Carp;
@@ -45,13 +65,14 @@ DESCRIPTION
     mentation.
 
 REVISION HISTORY
-    Changes since Win32::EventLog::Carp v1.36.  (Note: potential
+    Changes since Win32::EventLog::Carp v1.37.  (Note: potential
     incompatabilities are marked with '*'.)
 
-    1.37  Fri Aug  6 2004
-	- corrected how unregistered logs are opened
-	- corrected opening new error log in 01-basic.t test
-	- updated KNOWN ISSUES section of POD
+    1.38  Fri Dec 17 2004
+	- removed extraneous "ignoring event" message in tests
+	- fixed issue with tests failing on machines w/full logs
+	- added SIGNATURE to distribution
+	- added warning in README about WinZip and tests
 
     A detailed revision history is in the Changes file included with
     this distribution.

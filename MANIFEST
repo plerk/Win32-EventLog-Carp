@@ -5,6 +5,7 @@ Makefile.PL
 MANIFEST
 META.yml
 README
+SIGNATURE
 t/01-basic.t
 t/02-optional.t
 t/03-register.t

@@ -1,6 +1,12 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.38  Fri Dec 17 2004
+	- removed extraneous "ignoring event" message in tests
+	- fixed issue with tests failing on machines w/full logs
+	- added SIGNATURE to distribution
+	- added warning in README about WinZip and tests
+
 1.37  Fri Aug  6 2004
 	- corrected how unregistered logs are opened
 	- corrected opening new error log in 01-basic.t test

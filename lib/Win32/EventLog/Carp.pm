@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.37';
+$VERSION   = '1.38';
 
 require Carp;
 require Carp::Heavy;
@@ -282,6 +282,8 @@ Win32::EventLog::Carp - for carping in the Windows NT Event Log
 
   Carp
   Win32::EventLog
+
+These should be standard modules on Win32 systems.
 
 The module will use C<Win32::EventLog::Message> to register itself as a
 source, if that module is installed.
