@@ -1,7 +1,7 @@
 package Win32::EventLog::Carp;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $LogEvals);
 
 require Exporter;
 
@@ -9,7 +9,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.30';
+$VERSION   = '1.31';
 
 require Carp;
 require Carp::Heavy;
@@ -19,7 +19,7 @@ use File::Spec 'rel2abs';
 
 use Win32::EventLog;
 
-my ($EventLogHandle, $Source, $SourceFileName, $LogEvals, $Register);
+my ($EventLogHandle, $Source, $SourceFileName, $Register);
 
 # We want to provide options on the 'use Win32::EventLog::Carp' line
 
@@ -129,7 +129,7 @@ sub _ineval
     else            # Otherwise actually do a test
       {
 	# This test is based on the one used in CGI::Carp v1.20
-	return (Carp::longmess(@_) =~ /eval [\{\']/m)
+	return (Carp::longmess(@_) =~ /eval [\'\{]/m)
       }
   }
 
@@ -199,7 +199,9 @@ BEGIN
       {
 	my $previous = $SIG{__DIE__};
 	$SIG{__DIE__} = sub {
-	  _report( EVENTLOG_ERROR_TYPE, @_ );
+	  unless (_ineval(@_)) {
+	    _report( EVENTLOG_ERROR_TYPE, @_ );
+	  }
 	  return &$previous;
 	};
       }
@@ -326,6 +328,10 @@ C<LogEvals> option:
 	  LogEvals => 1
 	};
 
+You can also change the value from within your program:
+
+  $Win32::EventLog::Carp::LogEvals = 1;
+
 =head2 Event Source Registration
 
 If the F<Win32::EventLog::Message> module is installed on the system, I<and if
@@ -380,13 +386,12 @@ slashes in registered event log source names). The downside is that we have
 to view the event text to see which script it is (for common script names
 in a web site, for instance).
 
-Because of issues with F<Win32::EventLog>, running a script with the warning
-flag enabled (perl -w scriptname) will produce a lot of warnings about
-uninitialized values.
-
 In some server configurations using IIS (Windows Server 2003), you may
 need to set security policy to grant permissions to write to the event
 log(s).
+
+See L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-EventLog-Carp>
+for an up-to-date list of known issues and bugs.
 
 =head1 SEE ALSO
 

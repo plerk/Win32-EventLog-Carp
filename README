@@ -10,8 +10,16 @@ REQUIREMENTS
     Installation is pretty standard:
 
       perl Makefile.PL
-      make
-      make install
+      nmake
+      nmake test
+      nmake install
+
+    If you have Module::Build installed, you can use the following:
+
+      perl Build.PL
+      perl Build
+      perl Build test
+      perl Build install
 
 SYNOPSIS
       use Win32::EventLog::Carp;
@@ -37,6 +45,13 @@ DESCRIPTION
 REVISION HISTORY
     Changes since Win32::EventLog::Carp v1.21.  (Note: potential
     incompatabilities are marked with '*'.)
+
+    1.31  Fri Jun  4 2004
+	- LogEvals can now be set outside of the module
+	- fixed bug with LogEvals being ignored if another function is
+          hooked onto __DIE__ signal (RT#6508)
+	- rewrote tests to test writing every function, and to read 
+	  the events back
 
     1.30  Thu June  3 2004
 	- added tests

@@ -1,7 +1,14 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
-1.30  Thu June  3 2004
+1.31  Fri Jun  4 2004
+	- LogEvals can now be set outside of the module
+	- fixed bug with LogEvals being ignored if another function is
+          hooked onto __DIE__ signal (RT#6508)
+	- rewrote tests to test writing every function, and to read 
+	  the events back
+
+1.30  Thu Jun  3 2004
 	- added tests
 	- fixed issue with uninitialized values (RT#5408).
 	- added Build.PL as alternative to Makefile.PL
