@@ -1,7 +1,9 @@
+use strict;
+
 use Module::Build;
 
 require Win32;
-unless (Win32::WinNT) {
+unless (Win32::IsWinNT) {
   die "Windows NT (2000/XP/2003/etc) is required!\n";
 }
 

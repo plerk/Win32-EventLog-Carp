@@ -48,6 +48,9 @@ REVISION HISTORY
     Changes since Win32::EventLog::Carp v1.31.  (Note: potential
     incompatabilities are marked with '*'.)
 
+    1.33  Sat Jun  5 2004
+	- corrected typo (IsWinNT instead of WinNT)
+
     1.32  Sat Jun  5 2004 
 	- documented how to use with Windows 95/98/ME
 	- use Win32::NodeName instead of $ENV{COMPUTERNAME}
