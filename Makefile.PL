@@ -4,6 +4,8 @@ WriteMakefile(
     'VERSION_FROM' => 'Carp.pm',
     'PREREQ_PM'	   => {
         'Carp'            => 0,
+        'File::Basename'  => 0,
+	'File::Spec'      => 0,
         'Win32::EventLog' => 0,
       },
     'NORECURS'     => 1,

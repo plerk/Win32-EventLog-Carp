@@ -1,5 +1,18 @@
 Revision history for Perl extension Win32::EventLog::Carp.
 
+1.11  20 Jun 2001
+	- tested with Carp::Assert
+	- added register_source() function
+
+1.10   7 Feb 2001
+	- uses Win32::EventLog::Message to register the source,
+	  if the module is installed on the system
+	- the registration and initialization of the event log handle
+	  will be done in the _report() function
+	- the event text now begins with the script's absolute path
+	- the 'Source' in the event log is now the script's basename
+	- NUL characters in event text are treated like newlines
+
 1.00  10 Jan 2001
         - This version is a serious re-write!
 	- Win32 events are posted by trapping __WARN__ and __DIE__ signals
