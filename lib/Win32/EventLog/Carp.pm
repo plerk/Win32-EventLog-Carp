@@ -10,7 +10,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION   = '1.33';
+$VERSION   = '1.34';
 
 require Carp;
 require Carp::Heavy;
@@ -417,6 +417,10 @@ in a web site, for instance).
 In some server configurations using IIS (Windows Server 2003), you may
 need to set security policy to grant permissions to write to the event
 log(s).
+
+When using C<Test::Exception> functions such as C<dies_ok>, the source
+will be listed as the C<Test::Exception> module rather than the script
+that is running the tests.
 
 See L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-EventLog-Carp>
 for an up-to-date list of known issues and bugs.

@@ -45,18 +45,13 @@ DESCRIPTION
     mentation.
 
 REVISION HISTORY
-    Changes since Win32::EventLog::Carp v1.31.  (Note: potential
+    Changes since Win32::EventLog::Carp v1.33.  (Note: potential
     incompatabilities are marked with '*'.)
 
-    1.33  Sat Jun  5 2004
-	- corrected typo (IsWinNT instead of WinNT)
-
-    1.32  Sat Jun  5 2004 
-	- documented how to use with Windows 95/98/ME
-	- use Win32::NodeName instead of $ENV{COMPUTERNAME}
-	- minor changes to how modules are imported
-	- corrected Build.PL to require Test::More and Win32
-	- Build.PL will die on non-NT machines
+    1.34  Wed Jun 30 2004
+	- added note about using Test::Exception
+	- fixed warning posted to log when unable to read event log
+	- moved Test::More to build_requires parameter
 
     A detailed revision history is in the Changes file included with
     this distribution.

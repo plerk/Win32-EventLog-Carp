@@ -8,6 +8,9 @@ use constant NUM_ROUNDS => 2;
 
 use Test::More tests => 13+(39*NUM_ROUNDS);
 
+# TODO: fix issues with Test::Exception as source of errors, and make
+# use of it for more thorough tests.
+
 my $hnd;
 my ($cnt1, $cnt2, $cnt3);
 
@@ -147,7 +150,7 @@ sub _get_last_event {
     EVENTLOG_BACKWARDS_READ | EVENTLOG_SEQUENTIAL_READ, 0, $event)) {
     return $event;
   } else {
-    warn "Unable to read event log";
+    print "\x23 WARNING: Unable to read event log";
     return;
   }
 }
@@ -169,7 +172,7 @@ sub _get_last_event {
       my $key = "$1,$2";
       my $val = delete $Events{$key};
       ok(defined $val, "Found log entry for $key");
-      ok($val == $event->{EventType}, "Verified log entry type for $key");
+      ok($val == $event->{EventType}, "Verify log entry type for $key");
     }
   }
   ok((keys %Events)==0, "All events verified");
