@@ -1,0 +1,31 @@
+NAME
+    Win32::EventLog::Carp - for carping in the Windows NT Event Log
+
+SYNOPSIS
+      use Win32::EventLog::Carp;
+
+      my $code = &something() or croak "Unable to do something";
+
+      unless ($code)
+      {
+          carp "Nothing from something";
+      }
+
+DESCRIPTION
+    Win32::EventLog::Carp is a wrapper for the Carp module so that
+    messages are added to the Windows NT Event Log. This is useful
+    for Perl scripts which run as services or through the scheduler.
+
+    The interface is the same as Carp and it should function in the
+    same way (though it hasn't been tested as thoroughly).
+
+REQUIREMENTS
+      Carp
+      Win32::EventLog
+
+AUTHOR
+    Robert Rothenberg <rrwo@cpan.org>
+
+SEE ALSO
+    Win32::EventLog, Carp
+
