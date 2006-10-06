@@ -1,3 +1,6 @@
+This README documents Win32::EventLog::Carp, version 1.40, released
+2006-01-06.
+
 NAME
     Win32::EventLog::Carp - for carping in the Windows NT Event Log
 
@@ -68,22 +71,18 @@ REVISION HISTORY
     Changes since Win32::EventLog::Carp v1.37.  (Note: potential
     incompatabilities are marked with '*'.)
 
-    1.39  Mon Dec 20 2004
-	- corrected SIGNATURE issue
-
-    1.38  Fri Dec 17 2004
-	- removed extraneous "ignoring event" message in tests
-	- fixed issue with tests failing on machines w/full logs
-	- added SIGNATURE to distribution
-	- added warning in README about WinZip and tests
+    1.40 2006-10-06
+    - maintenance hand-over release. No functional changes.
 
     A detailed revision history is in the Changes file included with
     this distribution.
 
 AUTHOR
+    David Landgren <dland at cpan.org> (current maintainer)
     Robert Rothenberg <rrwo at cpan.org>
 
 LICENSE
-    Copyright (c) 2000-2004 Robert Rothenberg. All rights reserved. This
-    program is free software; you can redistribute it and/or modify it under
-    the same terms as Perl itself.
+    Copyright (c) 2000-2004 Robert Rothenberg. Copyright 2006 David Landgren.
+    All rights reserved.
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

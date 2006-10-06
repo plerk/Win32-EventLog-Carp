@@ -88,7 +88,7 @@ BEGIN {
   $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
 
-  ok($cnt2 == $cnt1, "Check against rt.cpan.org issue \x235408");
+  is($cnt2, $cnt1, "Check against rt.cpan.org issue \x235408");
 };
 
 
@@ -105,7 +105,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from click");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from click");
   }
   $Events{"click,$tag,$time"} = EVENTLOG_INFORMATION_TYPE;
 
@@ -117,7 +117,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from warn");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from warn");
   }
   $Events{"warn,$tag,$time"} = EVENTLOG_WARNING_TYPE;
 
@@ -129,7 +129,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from carp");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from carp");
   }
   $Events{"carp,$tag,$time"} = EVENTLOG_WARNING_TYPE;
 
@@ -141,7 +141,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from cluck");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from cluck");
   }
   $Events{"cluck,$tag,$time"} = EVENTLOG_WARNING_TYPE;
 
@@ -154,7 +154,7 @@ for my $tag (1..NUM_ROUNDS) {
 
   $cnt2 = get_number();
   ok(defined $cnt2, "Get size of event log");
-  ok($cnt2 == $cnt1, "Event log did not grow from eval die");
+  is($cnt2, $cnt1, "Event log did not grow from eval die");
 
   $cnt1 = $cnt2;
   $Win32::EventLog::Carp::LogEvals = 1;
@@ -167,7 +167,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from die");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from die");
   }
   $Events{"die,$tag,$time"} = EVENTLOG_ERROR_TYPE;
 
@@ -180,7 +180,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from croak");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from croak");
   }
   $Events{"croak,$tag,$time"} = EVENTLOG_ERROR_TYPE;
 
@@ -193,7 +193,7 @@ for my $tag (1..NUM_ROUNDS) {
   ok(defined $cnt2, "Get size of event log");
   {
     local $TODO = "log size might be maxed out";
-    ok($cnt2 > $cnt1, "Event log grown from confess");
+    cmp_ok($cnt2, '>', $cnt1, "Event log grown from confess");
   }
   $Events{"confess,$tag,$time"} = EVENTLOG_ERROR_TYPE;
 }
@@ -223,20 +223,20 @@ open_log();
       my $string = $event->{Strings};
 
       if ( ($string =~ /$filename\: test\,(\w+)\,(\d+),(\d+) at $filename/) &&
-	   ($event->{Source} eq SOURCE) ) {
-	if( $3 == $time) {
-	  my $key = "$1,$2,$3";
-	  ok((delete $Events{$key})==$event->{EventType},
-	     "verified event $key");
-	}
+           ($event->{Source} eq SOURCE) ) {
+        if( $3 == $time) {
+          my $key = "$1,$2,$3";
+          is((delete $Events{$key}), $event->{EventType},
+             "verified event $key");
+        }
       }
       else {
-#	print STDERR "\x23 Ignoring event: $string\n";
+         diag "\x23 Ignoring event: $string\n";
       }
       
   }
 
-  ok((keys %Events)==0, "All events verified");
+  is((keys %Events), 0, "All events verified");
 }
 
 

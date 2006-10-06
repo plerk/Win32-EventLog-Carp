@@ -29,8 +29,7 @@ my $build = Module::Build->new
        'Test::More'               => 0,
      },
      create_makefile_pl => 'traditional',
-     dist_author        => 'Robert Rothenberg <rrwo at cpan.org>',
-     sign               => 1,
+     dist_author        => 'Robert Rothenberg <rrwo at cpan.org> and David Landgren <dland at cpan.org>',
 );
 
 $build->create_build_script;

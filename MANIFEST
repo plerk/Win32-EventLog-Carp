@@ -1,12 +1,13 @@
 Build.PL
-lib/Win32/EventLog/Carp.pm
 Changes
-Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.yml
+Makefile.PL
 README
-SIGNATURE
+lib/Win32/EventLog/Carp.pm
 t/01-basic.t
 t/02-optional.t
 t/03-register.t
-SIGNATURE    Added here by Module::Build
+t/04-pod-coverage.t
+t/05-pod.t

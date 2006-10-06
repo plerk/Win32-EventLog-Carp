@@ -209,15 +209,15 @@ open_log();
       my $string = $event->{Strings};
 
       if ( ($string =~ /$filename\: test\,(\w+)\,(\d+),(\d+) at $filename/) &&
-	   ($event->{Source} eq SOURCE) ) {
-	if( $3 == $time) {
-	  my $key = "$1,$2,$3";
-	  ok((delete $Events{$key}) == $event->{EventType},
-	     "verified event $key");
-	}
+           ($event->{Source} eq SOURCE) ) {
+        if( $3 == $time) {
+          my $key = "$1,$2,$3";
+          ok((delete $Events{$key}) == $event->{EventType},
+             "verified event $key");
+        }
       }
       else {
-#	print STDERR "\x23 Ignoring event: $string\n";
+#        print STDERR "\x23 Ignoring event: $string\n";
       }
       
   }
