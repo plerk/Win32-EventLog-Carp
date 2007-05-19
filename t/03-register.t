@@ -55,7 +55,7 @@ sub get_last_event {
     EVENTLOG_BACKWARDS_READ() | EVENTLOG_SEQUENTIAL_READ(), 0, $event)) {
     return $event;
   } else {
-    print "\x23 WARNING: Unable to read event log\n";
+    diag( "WARNING: Unable to read event log" );
     return;
   }
 }
@@ -231,7 +231,8 @@ open_log();
         }
       }
       else {
-         diag "\x23 Ignoring event: $string\n";
+         exists $ENV{PERL_WIN32_EVENTLOG_CARP_TEST_VERBOSE}
+            and diag "Ignoring event: $string";
       }
       
   }

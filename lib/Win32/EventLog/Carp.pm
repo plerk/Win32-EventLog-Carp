@@ -11,7 +11,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 require Carp;
 require Carp::Heavy;
@@ -269,8 +269,8 @@ Win32::EventLog::Carp - for carping in the Windows NT Event Log
 
 =head1 BERSION
 
-This document describes version 1.40 of Win32::EventLog::Carp, released
-2006-10-06.
+This document describes version 1.41 of Win32::EventLog::Carp, released
+2007-05-19.
 
 =head1 REQUIREMENTS
 
@@ -309,7 +309,35 @@ to post a simple "I have started" or "I am doing XYZ now" message to the log.
 To avoid the stack trace, end the message with a newline (which is what
 happens with the C<Carp> module).
 
-All messages are posted the the Application Log we well as to STDERR.
+=head2 FUNCTIONS
+
+=over 4
+
+=item carp
+
+=item cluck
+
+=item confess
+
+=item croak
+
+See the documentation to the C<Carp> module for an explanation of these routines.
+The only difference is that instead of sending their output to STDERR, the message
+is also logged in the Application Log.
+
+=item click
+
+Similar to C<cluck>, except that it prints to STDERR directly, rather
+than going through Carp.
+
+=item register_source
+
+If the Win32::EventLog::Message module is available, register the source
+with the Windows NT event log (this only works if the user has the proper
+permissions). This removes the 'description not found' warning in when
+looking at the event in the event log viewer.
+
+=back
 
 =head2 Using Win32::EventLog::Carp with CGI::Carp
 

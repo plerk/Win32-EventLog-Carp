@@ -1,6 +1,9 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.41 2007-05-19
+    - Some public routines were not documented.
+
 1.40 2006-10-06
     - Maintenance taken over by David Landgren
     - No functional changes, this release serves only to bring

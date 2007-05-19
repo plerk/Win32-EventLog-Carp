@@ -11,5 +11,5 @@ my $have_Test_Pod_Coverage = do {
 SKIP: {
     skip( 'Test::Pod::Coverage not installed on this system', 1 )
         unless $have_Test_Pod_Coverage;
-    pod_coverage_ok( "Regexp::Assemble", "POD coverage is go!" );
+    pod_coverage_ok( "Win32::EventLog::Carp", "POD coverage is go!" );
 }
