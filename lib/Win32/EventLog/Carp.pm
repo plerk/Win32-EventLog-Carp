@@ -11,7 +11,7 @@ require Exporter;
 @EXPORT    = qw( confess carp croak );
 @EXPORT_OK = qw( cluck click register_source );
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 require Carp;
 require Carp::Heavy;

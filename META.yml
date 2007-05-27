@@ -1,6 +1,6 @@
 ---
 name: Win32-EventLog-Carp
-version: 1.41
+version: 1.42
 author:
   - 'Robert Rothenberg <rrwo at cpan.org> and David Landgren <dland at cpan.org>'
 abstract: for carping in the Windows NT Event Log
@@ -24,6 +24,6 @@ meta-spec:
 provides:
   Win32::EventLog::Carp:
     file: lib/Win32/EventLog/Carp.pm
-    version: 1.41
+    version: 1.42
 resources:
   license: http://dev.perl.org/licenses/

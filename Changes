@@ -1,6 +1,12 @@
 Revision history for Perl extension Win32::EventLog::Carp.  (Note:
 Potential incompatabilities are marked with '*'.)
 
+1.42 2007-05-27
+    - A better attempt to make the module get through the ActiveState
+      build process (the box in questions seems rather locked down).
+      No changes in the implementation itself, only t/01-basic.t
+    - Added an eg/ directory and example script.
+
 1.41 2007-05-19
     - Some public routines were not documented.
 
